@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment - Second Number</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .card-element {
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: white;
+      transition: all 0.3s ease;
+    }
+    
+    .card-element--focus {
+      border-color: #4299e1;
+      box-shadow: 0 0 0 1px #4299e1;
+    }
+    
+    .card-element--invalid {
+      border-color: #f56565;
+    }
+    
+    .payment-loader {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .payment-processing {
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Payment Loader -->
+  <div id="paymentLoader" class="payment-loader">
+    <div class="text-center">
+      <div class="payment-processing inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
+      <h3 class="text-lg font-medium text-gray-700">Processing Payment...</h3>
+      <p class="text-gray-500">Please wait while we process your transaction</p>
+    </div>
+  </div>
+
+  <div class="min-h-screen flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+      <!-- Payment Card -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-white">Complete Your Payment</h2>
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-lock text-white"></i>
+              <span class="text-white text-sm font-medium">Secure Payment</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Body -->
+        <div class="p-6">
+          <!-- Order Summary -->
+          <div class="bg-blue-50 rounded-lg p-4 mb-6">
+            <h3 class="font-medium text-blue-800 mb-2">Order Summary</h3>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Package:</span>
+              <span class="font-medium"><%= packageName || 'Second Number Service' %></span>
+            </div>
+            <div class="flex justify-between items-center mt-2">
+              <span class="text-gray-600">Amount:</span>
+              <span class="text-2xl font-bold text-blue-600">$<%= amount %></span>
+            </div>
+          </div>
+
+          <!-- Payment Form -->
+          <form method="post" id="payment-form" class="space-y-5">
+            <!-- Card Details -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Card Details</label>
+              <div id="card-element" class="card-element"></div>
+              <div id="card-errors" role="alert" class="text-red-500 text-xs mt-2"></div>
+            </div>
+            <!-- Hidden Fields -->
+            <input type="hidden" name="amount" value="<%= amount %>">
+            <input type="hidden" name="userId" id="userId" value="<%= userId %>">
+            <input type="hidden" name="packageId" id="packageId" value="<%= packageId %>">
+            <input type="hidden" name="stripeToken" id="stripeToken">
+
+            <!-- Payment Button -->
+            <button type="submit" id="submit-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-md transition flex items-center justify-center">
+              <i class="fas fa-lock mr-2"></i> Pay $<%= amount %>
+            </button>
+                        
+            <!-- Security Info -->
+            <div class="text-center text-xs text-gray-500 pt-4">
+              <!-- <p><i class="fas fa-shield-alt mr-1"></i> Your payment is securely processed by Stripe</p> -->
+              <p class="mt-1"><i class="fas fa-shield-alt mr-1"></i>We don't store your credit card information</p>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Support Info -->
+      <!-- <div class="mt-6 text-center text-sm text-gray-500">
+        <p>Need help? <a href="#" class="text-blue-600 hover:text-blue-800">Contact Support</a></p>
+      </div> -->
+    </div>
+  </div>
+
+  <script>
+    const stripe = Stripe('<%= publishableKey %>');
+    const elements = stripe.elements();
+    
+    // Custom styling for card element
+    const style = {
+      base: {
+        color: '#32325d',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': {
+          color: '#aab7c4'
+        }
+      },
+      invalid: {
+        color: '#fa755a',
+        iconColor: '#fa755a'
+      }
+    };
+    
+    const card = elements.create('card', { style });
+    card.mount('#card-element');
+    
+    // Handle real-time validation errors
+    card.addEventListener('change', function(event) {
+      const displayError = document.getElementById('card-errors');
+      if (event.error) {
+        displayError.textContent = event.error.message;
+        document.querySelector('.card-element').classList.add('card-element--invalid');
+      } else {
+        displayError.textContent = '';
+        document.querySelector('.card-element').classList.remove('card-element--invalid');
+      }
+    });
+    
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    const paymentLoader = document.getElementById('paymentLoader');
+    
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      // Show loading state
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Processing...';
+      paymentLoader.style.display = 'flex';
+      
+      try {
+        const { token, error } = await stripe.createToken(card);
+        
+        if (error) {
+          throw error;
+        }
+        
+        const payload = {
+          stripeToken: token.id,
+          amount: document.querySelector('input[name="amount"]').value,
+          userId: document.querySelector('input[name="userId"]').value,
+          packageId: document.querySelector('input[name="packageId"]').value
+        };
+        
+        const response = await fetch('/stripe/createCharges', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        console.log(result)
+        
+        if (result.status) {
+          await Swal.fire({
+            icon: 'success',
+            title: 'Payment Successful!',
+            html: `
+              <div class="text-center">
+                <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
+                <p class="text-gray-700 mb-2">Your payment of $${payload.amount} was processed successfully.</p>
+                <p class="text-sm text-gray-500">Transaction ID: ${result.transactionId || 'N/A'}</p>
+              </div>
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continue',
+            timer: 5000,
+            timerProgressBar: true,
+            willClose: () => {
+              window.location.href = "/stripe/success";
+            }
+          });
+          
+          // Redirect if not already
+          if (!Swal.isVisible()) {
+            window.location.href = "/stripe/success";
+          }
+        } else {
+          throw new Error(result.message || 'Payment failed. Please try again.');
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Payment Failed',
+          text: error.message,
+          confirmButtonColor: '#d33',
+          confirmButtonText: 'Try Again'
+        });
+      } finally {
+        // Reset form state
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-lock mr-2"></i> Pay $<%= amount %>';
+        paymentLoader.style.display = 'none';
+      }
+    });
+    
+    // Add focus/blur styling to card element
+    card.on('focus', () => {
+      document.querySelector('.card-element').classList.add('card-element--focus');
+    });
+    
+    card.on('blur', () => {
+      document.querySelector('.card-element').classList.remove('card-element--focus');
+    });
+  </script>
+</body>
+
+</html>
