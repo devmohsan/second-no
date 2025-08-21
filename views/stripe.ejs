@@ -18,16 +18,16 @@
       background: white;
       transition: all 0.3s ease;
     }
-    
+
     .card-element--focus {
       border-color: #4299e1;
       box-shadow: 0 0 0 1px #4299e1;
     }
-    
+
     .card-element--invalid {
       border-color: #f56565;
     }
-    
+
     .payment-loader {
       display: none;
       position: fixed;
@@ -40,14 +40,19 @@
       justify-content: center;
       align-items: center;
     }
-    
+
     .payment-processing {
       animation: spin 1s linear infinite;
     }
-    
+
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
   </style>
 </head>
@@ -76,19 +81,34 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Body -->
         <div class="p-6">
           <!-- Order Summary -->
           <div class="bg-blue-50 rounded-lg p-4 mb-6">
             <h3 class="font-medium text-blue-800 mb-2">Order Summary</h3>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Select Package</label>
+              <select id="packageSelect" name="packageId" class="w-full border border-gray-300 rounded-md p-2">
+                <option value="">-- Select a Package --</option>
+                <% packages.forEach(pkg => { %>
+                <option value="<%= pkg.id %>" data-price="<%= pkg.price %>">
+                  <%= pkg.name %> - $<%= pkg.price %>(<%= pkg.validity_days %> days)
+                </option>
+                <% }) %>
+              </select>
+            </div>
             <div class="flex justify-between items-center">
               <span class="text-gray-600">Package:</span>
-              <span class="font-medium"><%= packageName || 'Second Number Service' %></span>
+              <span class="font-medium" id="selectedPackageName">N/A</span>
             </div>
             <div class="flex justify-between items-center mt-2">
               <span class="text-gray-600">Amount:</span>
-              <span class="text-2xl font-bold text-blue-600">$<%= amount %></span>
+              <span class="text-2xl font-bold text-blue-600" id="selectedPackagePrice">$0</span>
+            </div>
+            <div class="flex justify-between items-center mt-2">
+              <span class="text-gray-600">Selected Number:</span>
+              <span class="text-2xl font-bold text-blue-600" id="selectedNumber"><%= number %></span>
             </div>
           </div>
 
@@ -101,36 +121,72 @@
               <div id="card-errors" role="alert" class="text-red-500 text-xs mt-2"></div>
             </div>
             <!-- Hidden Fields -->
-            <input type="hidden" name="amount" value="<%= amount %>">
+            <input type="hidden" name="amount" id="amountInput" value="0">
             <input type="hidden" name="userId" id="userId" value="<%= userId %>">
-            <input type="hidden" name="packageId" id="packageId" value="<%= packageId %>">
+            <input type="hidden" name="packageId" id="packageIdInput" value="0">
+            <input type="hidden" name="num_id" id="selectNumber" value="<%= number%>">
+            <input type="hidden" name="countryCode" id="countryCode" value="<%= countryCode %>">
+            <input type="hidden" name="nmbrId" id="nmbrId" value="<%= nmbrId %>">
             <input type="hidden" name="stripeToken" id="stripeToken">
 
             <!-- Payment Button -->
             <button type="submit" id="submit-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-md transition flex items-center justify-center">
-              <i class="fas fa-lock mr-2"></i> Pay $<%= amount %>
+              <i class="fas fa-lock mr-2"></i> Pay $0
             </button>
-                        
+
             <!-- Security Info -->
             <div class="text-center text-xs text-gray-500 pt-4">
-              <!-- <p><i class="fas fa-shield-alt mr-1"></i> Your payment is securely processed by Stripe</p> -->
               <p class="mt-1"><i class="fas fa-shield-alt mr-1"></i>We don't store your credit card information</p>
             </div>
           </form>
         </div>
       </div>
-      
-      <!-- Support Info -->
-      <!-- <div class="mt-6 text-center text-sm text-gray-500">
-        <p>Need help? <a href="#" class="text-blue-600 hover:text-blue-800">Contact Support</a></p>
-      </div> -->
     </div>
   </div>
 
   <script>
+    // Package Selection Handler
+    document.addEventListener('DOMContentLoaded', function() {
+      const packageSelect = document.getElementById('packageSelect');
+      const packageNameEl = document.getElementById('selectedPackageName');
+      const packagePriceEl = document.getElementById('selectedPackagePrice');
+      const amountInput = document.getElementById('amountInput');
+      const packageIdInput = document.getElementById('packageIdInput');
+      const submitButton = document.getElementById('submit-button');
+      const selectedNumber= document.getElementById('selectedNumber')
+
+      packageSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        
+        if (selectedOption.value) {
+          const packageName = selectedOption.text.split('-')[0].trim();
+          const packagePrice = selectedOption.getAttribute('data-price');
+          
+          // Update displayed information
+          packageNameEl.textContent = packageName;
+          packagePriceEl.textContent = `$${packagePrice}`;
+          
+          // Update hidden form fields
+          amountInput.value = packagePrice;
+          packageIdInput.value = selectedOption.value;
+          
+          // Update button text
+          submitButton.innerHTML = `<i class="fas fa-lock mr-2"></i> Pay $${packagePrice}`;
+        } else {
+          // Reset if no package selected
+          packageNameEl.textContent = 'N/A';
+          packagePriceEl.textContent = '$0';
+          amountInput.value = '0';
+          packageIdInput.value = '0';
+          submitButton.innerHTML = '<i class="fas fa-lock mr-2"></i> Pay $0';
+        }
+      });
+    });
+
+    // Stripe Payment Handler
     const stripe = Stripe('<%= publishableKey %>');
     const elements = stripe.elements();
-    
+
     // Custom styling for card element
     const style = {
       base: {
@@ -147,10 +203,10 @@
         iconColor: '#fa755a'
       }
     };
-    
+
     const card = elements.create('card', { style });
     card.mount('#card-element');
-    
+
     // Handle real-time validation errors
     card.addEventListener('change', function(event) {
       const displayError = document.getElementById('card-errors');
@@ -162,34 +218,49 @@
         document.querySelector('.card-element').classList.remove('card-element--invalid');
       }
     });
-    
+
     // Handle form submission
     const form = document.getElementById('payment-form');
     const submitButton = document.getElementById('submit-button');
     const paymentLoader = document.getElementById('paymentLoader');
-    
+
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
-      
+
+      // Validate package selection
+      const packageId = document.getElementById('packageIdInput').value;
+      if (!packageId || packageId === '0') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Package Required',
+          text: 'Please select a package before proceeding with payment',
+          confirmButtonColor: '#d33'
+        });
+        return;
+      }
+
       // Show loading state
       submitButton.disabled = true;
       submitButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Processing...';
       paymentLoader.style.display = 'flex';
-      
+
       try {
         const { token, error } = await stripe.createToken(card);
-        
+
         if (error) {
           throw error;
         }
-        
+
         const payload = {
           stripeToken: token.id,
-          amount: document.querySelector('input[name="amount"]').value,
-          userId: document.querySelector('input[name="userId"]').value,
-          packageId: document.querySelector('input[name="packageId"]').value
+          amount: document.getElementById('amountInput').value,
+          userId: document.getElementById('userId').value,
+          packageId: packageId,
+          num_id: document.getElementById('nmbrId').value,
+          countryCode: document.getElementById('countryCode').value,
+          number: document.getElementById('selectNumber').value
         };
-        
+
         const response = await fetch('/stripe/createCharges', {
           method: 'POST',
           headers: {
@@ -197,11 +268,11 @@
           },
           body: JSON.stringify(payload)
         });
-        
+
         const result = await response.json();
-        console.log(result)
-        
+
         if (result.status) {
+          paymentLoader.style.display = 'none';
           await Swal.fire({
             icon: 'success',
             title: 'Payment Successful!',
@@ -209,7 +280,6 @@
               <div class="text-center">
                 <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
                 <p class="text-gray-700 mb-2">Your payment of $${payload.amount} was processed successfully.</p>
-                <p class="text-sm text-gray-500">Transaction ID: ${result.transactionId || 'N/A'}</p>
               </div>
             `,
             showConfirmButton: true,
@@ -220,8 +290,7 @@
               window.location.href = "/stripe/success";
             }
           });
-          
-          // Redirect if not already
+
           if (!Swal.isVisible()) {
             window.location.href = "/stripe/success";
           }
@@ -237,18 +306,18 @@
           confirmButtonText: 'Try Again'
         });
       } finally {
-        // Reset form state
         submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-lock mr-2"></i> Pay $<%= amount %>';
+        const amount = document.getElementById('amountInput').value;
+        submitButton.innerHTML = `<i class="fas fa-lock mr-2"></i> Pay $${amount}`;
         paymentLoader.style.display = 'none';
       }
     });
-    
+
     // Add focus/blur styling to card element
     card.on('focus', () => {
       document.querySelector('.card-element').classList.add('card-element--focus');
     });
-    
+
     card.on('blur', () => {
       document.querySelector('.card-element').classList.remove('card-element--focus');
     });

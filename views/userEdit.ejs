@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Second Number - Edit User</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+    }
+    
+    :root {
+      --color-primary: #2e2545;
+      --color-primary-light: #3a3152;
+      --color-accent: #7c6caf;
+    }
+    
+    .card {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    
+    .readonly-field {
+      background-color: #f9fafb;
+      cursor: not-allowed;
+    }
+    
+    .avatar-preview {
+      transition: all 0.3s ease;
+    }
+    
+    .avatar-preview:hover {
+      transform: scale(1.05);
+    }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #10b981;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <div class="flex h-screen overflow-hidden">
+    <%- include('partials/sidebar') %>
+
+    <div class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
+      <%- include('partials/header') %>
+
+      <main class="flex-1 p-6">
+        <div class="max-w-3xl mx-auto">
+          <!-- Back button and title -->
+          <div class="flex items-center mb-6">
+            <a href="/admin/users" class="mr-4 p-2 rounded-md hover:bg-gray-100">
+              <i class="fas fa-arrow-left text-gray-500"></i>
+            </a>
+            <h1 class="text-2xl font-bold text-gray-800">Edit User</h1>
+          </div>
+
+          <!-- Edit form -->
+          <form action="/admin/users/update/<%= user.id %>" method="POST" enctype="multipart/form-data" class="card bg-white rounded-xl p-6">
+            <!-- Profile image upload -->
+            <div class="flex flex-col items-center mb-8">
+              <div class="relative group">
+                <% if (user.profile_image) { %>
+                  <img id="avatarPreview" src="<%= user.profile_image %>" alt="Profile" class="h-24 w-24 rounded-full object-cover shadow-md ring-2 ring-white avatar-preview">
+                <% } else { %>
+                  <img id="avatarPreview" src="/avatar.jpg" alt="Default Profile" class="h-24 w-24 rounded-full object-cover shadow-md ring-2 ring-white avatar-preview">
+                <% } %>
+                <label for="profile_image" class="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-md cursor-pointer group-hover:bg-gray-100 transition">
+                  <i class="fas fa-camera text-gray-600"></i>
+                  <input type="file" id="profile_image" name="profile_image" accept="image/*" class="hidden" onchange="previewImage(this)">
+                </label>
+              </div>
+              <p class="text-sm text-gray-500 mt-2">Click camera icon to change profile image</p>
+            </div>
+
+            <!-- User details -->
+            <div class="grid grid-cols-1 gap-6">
+              <!-- Name -->
+              <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input type="text" id="name" name="name" value="<%= user.name %>" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]">
+              </div>
+
+              <!-- Email (readonly) -->
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" value="<%= user.email %>" class="w-full px-4 py-2 border border-gray-300 rounded-md readonly-field" readonly>
+              </div>
+
+              <!-- Phone -->
+              <div>
+                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <input type="tel" id="phone" name="phone" value="<%= user.phone || '' %>" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]">
+              </div>
+
+              <!-- User Type (readonly) -->
+              <div>
+                <label for="user_type" class="block text-sm font-medium text-gray-700 mb-1">User Type</label>
+                <input type="text" id="user_type" value="<%= user.user_type %>" class="w-full px-4 py-2 border border-gray-300 rounded-md readonly-field capitalize" readonly>
+              </div>
+
+              <!-- Login Type (readonly) -->
+              <div>
+                <label for="loginType" class="block text-sm font-medium text-gray-700 mb-1">Login Type</label>
+                <input type="text" id="loginType" value="<%= user.loginType || 'Default' %>" class="w-full px-4 py-2 border border-gray-300 rounded-md readonly-field" readonly>
+              </div>
+
+              <!-- Status toggle -->
+              <div class="flex items-center justify-between pt-2">
+                <label class="block text-sm font-medium text-gray-700">Account Status</label>
+                <label class="switch">
+                  <input type="checkbox" name="is_active" <%= user.is_active ? 'checked' : '' %>>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <!-- Credits (readonly) -->
+              <div>
+                <label for="credits" class="block text-sm font-medium text-gray-700 mb-1">Credits</label>
+                <input type="text" id="credits" value="<%= user.credits || '0' %>" class="w-full px-4 py-2 border border-gray-300 rounded-md readonly-field" readonly>
+              </div>
+
+              <!-- Coins (readonly) -->
+              <div>
+                <label for="coins" class="block text-sm font-medium text-gray-700 mb-1">Coins</label>
+                <input type="text" id="coins" value="<%= user.coins || '0' %>" class="w-full px-4 py-2 border border-gray-300 rounded-md readonly-field" readonly>
+              </div>
+
+              <!-- Created At (readonly) -->
+              <div>
+                <label for="created_at" class="block text-sm font-medium text-gray-700 mb-1">Account Created</label>
+                <input type="text" id="created_at" value="<%= new Date(user.created_at).toLocaleString() %>" class="w-full px-4 py-2 border border-gray-300 rounded-md readonly-field" readonly>
+              </div>
+            </div>
+
+            <!-- Form actions -->
+            <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end space-x-3">
+              <button type="submit" class="px-4 py-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] text-white rounded-md flex items-center">
+                <i class="fas fa-save mr-2"></i> Save Changes
+              </button>
+              <a href="/admin/users" class="px-4 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 rounded-md">
+                Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Preview uploaded profile image
+    function previewImage(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('avatarPreview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+  </script>
+</body>
+
+</html>

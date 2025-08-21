@@ -1,0 +1,182 @@
+<div id="sidebar" class="h-screen flex flex-col bg-gradient-to-b from-[#2e2545] to-[#1a142a] border-r border-gray-700/30 shadow-xl transition-all duration-300 ease-in-out overflow-hidden w-64">
+  <!-- Sidebar Header -->
+  <div class="p-4 border-b border-gray-700/30 flex justify-between items-center">
+    <div class="flex items-center gap-3 bg-white/90 px-3 py-1.5 rounded-lg shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md min-w-max">
+      <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-[#7c6caf] to-[#d4d1e0] flex items-center justify-center shadow-md ring-2 ring-white/30">
+        <span class="text-[#2e2545] font-bold text-lg tracking-wide">2N</span>
+      </div>
+      <h1 class="text-lg font-bold bg-gradient-to-r from-[#7c6caf] to-[#2e2545] bg-clip-text text-transparent tracking-tight whitespace-nowrap transition-opacity duration-300" id="sidebarTitle">
+        Second<span class="font-extrabold">Number</span>
+      </h1>
+    </div>
+
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 px-2 py-4 overflow-y-auto space-y-1">
+    <!-- Dashboard -->
+    <a href="/admin/dashboard" class="flex items-center px-3 py-2.5 rounded-lg group transition-all duration-200 font-medium text-white/90 hover:text-white hover:bg-white/5 relative">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-[#7c6caf] group-hover:text-[#a396cf] transition-colors" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+        </svg>
+        <span class="sidebar-text transition-all duration-200 whitespace-nowrap">Dashboard</span>
+      </div>
+      <span class="ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-1 group-hover:translate-x-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#7c6caf]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+      <span class="absolute left-0 top-0 h-full w-1 bg-[#7c6caf] rounded-r-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+    </a>
+
+    <!-- Users -->
+    <a href="/admin/users" class="flex items-center px-3 py-2.5 rounded-lg group transition-all duration-200 font-medium text-white/90 hover:text-white hover:bg-white/5 relative">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-[#7c6caf] group-hover:text-[#a396cf] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        <span class="sidebar-text transition-all duration-200 whitespace-nowrap">Users</span>
+      </div>
+      <span class="ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-1 group-hover:translate-x-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#7c6caf]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+      <span class="absolute left-0 top-0 h-full w-1 bg-[#7c6caf] rounded-r-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+    </a>
+
+    <!-- Listings -->
+    <a href="/admin/numbers" class="flex items-center px-3 py-2.5 rounded-lg group transition-all duration-200 font-medium text-white/90 hover:text-white hover:bg-white/5 relative">
+      <div class="flex items-center">
+        <!-- Numbers Icon (Hashtag) -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-[#7c6caf] group-hover:text-[#a396cf] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18" />
+        </svg>
+        <span class="sidebar-text transition-all duration-200 whitespace-nowrap">Numbers</span>
+      </div>
+      <span class="ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-1 group-hover:translate-x-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#7c6caf]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+      <span class="absolute left-0 top-0 h-full w-1 bg-[#7c6caf] rounded-r-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+    </a>
+
+
+    <a href="/admin/rewards" class="flex items-center px-3 py-2.5 rounded-lg group transition-all duration-200 font-medium text-white/90 hover:text-white hover:bg-white/5 relative">
+      <div class="flex items-center">
+        <!-- Settings Icon (Gear/Cog) -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-[#7c6caf] group-hover:text-[#a396cf] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8M4 8h16M12 22V8m-4-4a2 2 0 104 0 2 2 0 10-4 0zm4 0a2 2 0 114 0 2 2 0 11-4 0z" />
+        </svg>
+        <span class="sidebar-text transition-all duration-200 whitespace-nowrap">Rewards</span>
+      </div>
+      <span class="ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-1 group-hover:translate-x-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#7c6caf]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+      <span class="absolute left-0 top-0 h-full w-1 bg-[#7c6caf] rounded-r-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+    </a>
+
+    <a href="/admin/coin_offers" class="flex items-center px-3 py-2.5 rounded-lg group transition-all duration-200 font-medium text-white/90 hover:text-white hover:bg-white/5 relative">
+      <div class="flex items-center">
+        <!-- Crown with Coin Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-[#7c6caf] group-hover:text-[#a396cf] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L9 7 2 7l3 13h14l3-13-7 0-2-5z" />
+          <circle cx="12" cy="14" r="3" />
+        </svg>
+        <span class="sidebar-text transition-all duration-200 whitespace-nowrap">Coin Offers</span>
+      </div>
+      <span class="ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-1 group-hover:translate-x-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#7c6caf]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+      <span class="absolute left-0 top-0 h-full w-1 bg-[#7c6caf] rounded-r-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+    </a>
+
+    <a href="/admin/credit_packages" class="flex items-center px-3 py-2.5 rounded-lg group transition-all duration-200 font-medium text-white/90 hover:text-white hover:bg-white/5 relative">
+      <div class="flex items-center">
+        <!-- Credit Card with Package Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-[#7c6caf] group-hover:text-[#a396cf] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="5" width="20" height="14" rx="2" />
+          <line x1="2" y1="10" x2="22" y2="10" />
+          <path d="M6 14h4" />
+          <path d="M8 16v-4" />
+          <path d="M14 14h2" />
+          <path d="M16 12v4" />
+        </svg>
+        <span class="sidebar-text transition-all duration-200 whitespace-nowrap">Credit Packages</span>
+      </div>
+      <span class="ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-1 group-hover:translate-x-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#7c6caf]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+      <span class="absolute left-0 top-0 h-full w-1 bg-[#7c6caf] rounded-r-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+    </a>
+
+    <a href="/admin/packages" class="flex items-center px-3 py-2.5 rounded-lg group transition-all duration-200 font-medium text-white/90 hover:text-white hover:bg-white/5 relative">
+      <div class="flex items-center">
+        <!-- Package Box with Dollar Sign -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-[#7c6caf] group-hover:text-[#a396cf] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" />
+          <path d="M12 12l8-4.5" />
+          <path d="M12 12v9" />
+          <path d="M12 12L4 7.5" />
+          <path d="M8 9.5l8 4.5" />
+          <path d="M8 14.5l8-4.5" />
+          <path d="M12 8v1" />
+          <path d="M12 15v-1" />
+        </svg>
+        <span class="sidebar-text transition-all duration-200 whitespace-nowrap">Packages</span>
+      </div>
+      <span class="ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-1 group-hover:translate-x-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#7c6caf]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+      <span class="absolute left-0 top-0 h-full w-1 bg-[#7c6caf] rounded-r-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+    </a>
+
+    <a href="/admin/settings" class="flex items-center px-3 py-2.5 rounded-lg group transition-all duration-200 font-medium text-white/90 hover:text-white hover:bg-white/5 relative">
+      <div class="flex items-center">
+        <!-- Settings Icon (Gear/Cog) -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-[#7c6caf] group-hover:text-[#a396cf] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span class="sidebar-text transition-all duration-200 whitespace-nowrap">Settings</span>
+      </div>
+      <span class="ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-1 group-hover:translate-x-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#7c6caf]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+      <span class="absolute left-0 top-0 h-full w-1 bg-[#7c6caf] rounded-r-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+    </a>
+
+
+  </nav>
+
+  <!-- Sidebar Footer -->
+  <div class="p-3 border-t border-gray-700/30 bg-[#2e2545]/90 backdrop-blur-sm">
+    <div class="flex items-center space-x-2 group cursor-pointer hover:bg-white/10 rounded-lg p-2 transition-all duration-200">
+      <div class="h-8 w-8 rounded-full bg-gradient-to-br from-[#7c6caf] to-[#2e2545] flex items-center justify-center font-bold text-sm shadow-md text-white ring-2 ring-white/20 group-hover:ring-[#7c6caf]/50">
+        <%= admin.name.charAt(0).toUpperCase() %>
+      </div>
+      <div class="min-w-0 sidebar-text transition-all duration-200 overflow-hidden">
+        <p class="text-sm font-medium truncate text-white"><%= admin.name %></p>
+        <p class="text-xs text-gray-300/80 truncate group-hover:text-white/80 transition-colors">Administrator</p>
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 group-hover:text-[#7c6caf] transition-colors sidebar-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </div>
+</div>

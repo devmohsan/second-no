@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Second Number - Edit Rewards</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    :root {
+      --color-primary: #2e2545;
+      --color-primary-light: #3a3152;
+      --color-accent: #7c6caf;
+      --color-accent-light: #a396cf;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-input {
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      box-shadow: 0 0 0 3px rgba(124, 108, 175, 0.1);
+    }
+
+    .coin-badge {
+      display: inline-flex;
+      align-items: center;
+      background: linear-gradient(135deg, #fcd34d, #f59e0b);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .status-toggle {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+
+    .status-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .status-toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #e5e7eb;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .status-toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .status-toggle-slider {
+      background-color: #10b981;
+    }
+
+    input:checked + .status-toggle-slider:before {
+      transform: translateX(30px);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-sans antialiased">
+  <div class="flex h-screen overflow-hidden">
+    <%- include('partials/sidebar') %>
+
+    <div class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
+      <%- include('partials/header') %>
+      
+      <main class="flex-1 p-6">
+        <div class="max-w-4xl mx-auto animate-fade-in">
+          <!-- Back Button -->
+          <div class="mb-6">
+            <a href="/admin/rewards" class="inline-flex items-center text-[var(--color-primary)] hover:text-[var(--color-primary-light)] transition-colors">
+              <i class="fas fa-arrow-left mr-2"></i> Back to Rewards
+            </a>
+          </div>
+
+          <!-- Main Card -->
+          <div class="card bg-white rounded-xl p-6 mb-6">
+            <!-- Header Section -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+              <div>
+                <h1 class="text-2xl font-bold text-gray-800">Edit Reward</h1>
+                <p class="text-gray-600 mt-2">Update reward details and settings</p>
+              </div>
+              
+              <div class="mt-4 md:mt-0">
+                <span class="coin-badge">
+                  <i class="fas fa-coins mr-2"></i> <%= reward.coins %> Coins
+                </span>
+              </div>
+            </div>
+
+            <!-- Edit Form -->
+            <form action="/admin/rewards/update/<%= reward.id %>" method="POST" class="space-y-6">
+              <!-- Action Key (Readonly) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Action Key</label>
+                <input 
+                  type="text" 
+                  value="<%= reward.action_key %>" 
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed form-input" 
+                  readonly
+                  disabled
+                >
+                <p class="text-xs text-gray-500 mt-2">This identifier cannot be changed as it's used in the application code.</p>
+              </div>
+
+              <!-- Title -->
+              <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                <input 
+                  type="text" 
+                  id="title"
+                  name="title" 
+                  value="<%= reward.title %>" 
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all duration-200 form-input" 
+                  placeholder="Enter reward title"
+                  required
+                >
+              </div>
+
+              <!-- Description -->
+              <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea 
+                  id="description"
+                  name="description" 
+                  rows="4" 
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all duration-200 form-input" 
+                  placeholder="Enter reward description"
+                ><%= reward.description %></textarea>
+              </div>
+
+              <!-- Coins (Readonly) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Coins Value</label>
+                <input 
+                  type="number"
+                  name="coins" 
+                  title="coins"
+                  value="<%= reward.coins %>" 
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50  form-input" 
+                >
+              </div>
+
+              <!-- Status Toggle -->
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <p class="text-sm text-gray-600">Set whether this reward is active or inactive</p>
+                </div>
+                <label class="status-toggle">
+                  <input 
+                    type="checkbox" 
+                    name="status" 
+                    value="active" 
+                    <%= reward.status === 'active' ? 'checked' : '' %>
+                  >
+                  <span class="status-toggle-slider"></span>
+                </label>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t">
+                <button 
+                  type="submit" 
+                  class="px-6 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] text-white font-medium rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                >
+                  <i class="fas fa-save mr-2"></i> Update Reward
+                </button>
+                <a 
+                  href="/admin/rewards" 
+                  class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors text-center"
+                >
+                  <i class="fas fa-times mr-2"></i> Cancel
+                </a>
+
+              </div>
+            </form>           
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Add form validation if needed
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form');
+      form.addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        if (!title) {
+          e.preventDefault();
+          alert('Please enter a title for the reward.');
+          document.getElementById('title').focus();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

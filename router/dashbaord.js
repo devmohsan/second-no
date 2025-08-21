@@ -11,12 +11,23 @@ router.get('/user-dashboard', authenticateToken, async (req, res) => {
 
     // Query user packages
     const userPackages = await db.mySqlQury(
-      'SELECT * FROM user_packages WHERE user_id=?',
-      [userId]
+      `SELECT up.*, pn.number AS purchased_number, pn.c_name
+       FROM user_packages up
+       LEFT JOIN purchased_no pn ON up.num_id = pn.id
+       WHERE up.user_id = ? AND up.status = ?`,
+      [userId, 'active']
     );
 
-    // If your db helper returns [rows, fields], use destructuring:
-    // const [userPackages] = await db.mySqlQury(...);
+      const purchasedNumbers = userPackages
+      .filter(pkg => pkg.purchased_number) // Only those with a purchased number
+      .map(pkg => ({
+        id: pkg.num_id,
+        number: pkg.purchased_number,
+        c_name: pkg.c_name,
+        expiry_date: pkg.end_date
+
+
+      }));
 
     if (!userPackages || userPackages.length === 0) {
       return res.json({
@@ -26,26 +37,30 @@ router.get('/user-dashboard', authenticateToken, async (req, res) => {
       });
     }
 
+    const [user]= await db.mySqlQury(
+      'SELECT * FROM users WHERE id= ?',
+      [userId]
+    )
+
     // Calculate totals
-    const totals = userPackages.reduce(
-      (acc, pkg) => {
-        acc.remaining_minutes += pkg.remaining_minutes;
-        acc.remaining_texts += pkg.remaining_texts;
-        acc.remaining_credits += parseFloat(pkg.remaining_credits);
-        return acc;
-      },
-      { remaining_minutes: 0, remaining_texts: 0, remaining_credits: 0 }
-    );
+
+    const totals={
+       remainingCredits: user.credits,
+       remainingCoins: user.coins
+
+    }
+
 
     return res.json({
       status: true,
       message: 'Dashboard data fetched successfully',
       userPackages,
-      totals,
+      purchasedNumbers,
+      totals
     });
   } catch (error) {
     console.error('Dashboard error:', error);
-    return res.status(500).json({ status: false, error: 'Server error' });
+    return res.json({ status: false, message: 'Server error' });
   }
 });
 

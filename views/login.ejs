@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Second Number Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8f7fa;
+    }
+
+    :root {
+      --color-primary: #2e2545;
+      --color-primary-light: #3a3152;
+      --color-primary-lighter: #463d5f;
+      --color-accent: #7c6caf;
+    }
+
+    .logo-circle {
+      box-shadow: 0 4px 6px -1px rgba(46, 37, 69, 0.1), 0 2px 4px -1px rgba(46, 37, 69, 0.06);
+    }
+
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+      box-shadow: 0 10px 25px -5px rgba(46, 37, 69, 0.1);
+      border-color: #d8d1e7;
+    }
+
+    .btn-primary {
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+    }
+
+    .input-focus:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px var(--color-primary);
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen px-4">
+
+  <div class="bg-white p-8 sm:p-10 rounded-xl shadow-sm w-full max-w-sm sm:max-w-md border border-gray-100 card-hover">
+
+    <!-- Logo -->
+    <div class="flex justify-center mb-6">
+      <div class="h-16 w-16 rounded-full bg-[var(--color-primary)] flex items-center justify-center logo-circle">
+        <span class="text-white font-bold text-lg tracking-wide">2N</span>
+      </div>
+    </div>
+
+    <div class="flex justify-center mb-2">
+      <h1 class="text-2xl font-bold text-[var(--color-primary)]">
+        Second Number
+      </h1>
+    </div>
+
+    <!-- Title -->
+    <h2 class="text-2xl font-semibold text-center text-gray-800 mb-1">Welcome Back</h2>
+    <p class="text-center text-sm text-gray-500 mb-6">Sign in to manage your account</p>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="space-y-4">
+
+      <!-- Email Field -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none input-focus transition duration-150" required />
+      </div>
+
+      <!-- Password Field -->
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none input-focus transition duration-150" required />
+      </div>
+
+      <!-- Remember Me -->
+      <div class="flex items-center justify-between">
+        <label class="flex items-center space-x-2 text-sm text-gray-600">
+          <input type="checkbox" id="remember" name="remember" class="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)] border-gray-300 rounded" />
+          <span>Remember me</span>
+        </label>
+        <a href="#" class="text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-light)]">Forgot password?</a>
+      </div>
+
+      <!-- Error Message -->
+      <p id="errorMessage" class="text-red-500 text-sm hidden"></p>
+      <!-- Submit Button -->
+      <div class="pt-2">
+        <button type="submit" class="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] text-white py-2.5 px-6 rounded-lg font-medium text-sm shadow-sm btn-primary">
+          Sign In
+        </button>
+      </div>
+    </form>
+
+    <!-- Footer Text -->
+    <div class="mt-6 text-center text-xs text-gray-400">
+      © <script>
+        document.write(new Date().getFullYear());
+      </script> Second Number. All rights reserved.
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorMessage = document.getElementById("errorMessage");
+
+      errorMessage.classList.add("hidden"); // reset error
+
+      try {
+        const res = await fetch("/admin/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email,
+            password
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.status) {
+          errorMessage.textContent = data.message;
+          errorMessage.classList.remove("hidden");
+        } else {
+          window.location.href = data.redirect;
+        }
+
+      } catch (err) {
+        errorMessage.textContent = "Something went wrong. Please try again.";
+        errorMessage.classList.remove("hidden");
+      }
+    });
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,116 @@
+<div class="bg-white shadow-sm px-6 py-3 flex items-center justify-between border-b border-gray-100 sticky top-0 z-40 backdrop-blur-sm bg-white/90">
+  <!-- Left: Logo + Hamburger Menu -->
+  <div class="flex items-center space-x-4">
+    <button id="toggleSidebar" class="flex items-center justify-center rounded-md p-2 hover:bg-gray-50 focus:outline-none 
+         focus:ring-2 focus:ring-[#2e2545] focus:ring-offset-2 transition-all duration-150">
+      <!-- Default: hamburger -->
+      <svg id="sidebarIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#2e2545]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+    <h1 class="text-lg font-semibold text-[#2e2545] hidden md:block"> Admin Dashboard</h1>
+  </div>
+
+  <!-- Right: Admin Dropdown -->
+  <div class="relative">
+    <button id="adminDropdownBtn" class="flex items-center gap-2 group focus:outline-none rounded-lg transition-all duration-200 hover:bg-gray-50 px-2 py-1">
+      <div class="h-8 w-8 rounded-full bg-gradient-to-br from-[#2e2545] to-[#7c6caf] flex items-center justify-center text-white text-sm font-medium shadow-sm">
+        <%= admin.name.charAt(0).toUpperCase() %>
+      </div>
+      <div class="hidden md:flex md:flex-col md:items-start">
+        <p class="text-sm font-medium text-gray-800 leading-tight"><%= admin.name %></p>
+        <p class="text-xs text-gray-500">Administrator</p>
+      </div>
+      <svg class="w-4 h-4 text-gray-400 group-hover:text-[#2e2545] transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.173l3.71-3.942a.75.75 0 011.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+      </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div id="adminDropdownMenu" class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl py-1 z-50 divide-y divide-gray-100 hidden opacity-0 scale-95 transform transition-all duration-150 origin-top-right">
+      <div class="px-4 py-3">
+        <p class="text-sm font-medium text-gray-900 truncate"><%= admin.name %></p>
+        <p class="text-xs text-gray-500 truncate"><%= admin.email %></p>
+      </div>
+      <form method="POST" action="/admin/logout" class="block">
+        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors duration-150">
+          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Sign out</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const dropdownBtn = document.getElementById('adminDropdownBtn');
+  const dropdownMenu = document.getElementById('adminDropdownMenu');
+
+  dropdownBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const isHidden = dropdownMenu.classList.contains('hidden');
+
+    // Close all other dropdowns first
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      if (menu !== dropdownMenu) {
+        menu.classList.add('hidden', 'opacity-0', 'scale-95');
+        menu.classList.remove('opacity-100', 'scale-100');
+      }
+    });
+
+    if (isHidden) {
+      dropdownMenu.classList.remove('hidden', 'opacity-0', 'scale-95');
+      dropdownMenu.classList.add('opacity-100', 'scale-100');
+    } else {
+      dropdownMenu.classList.add('hidden', 'opacity-0', 'scale-95');
+      dropdownMenu.classList.remove('opacity-100', 'scale-100');
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!dropdownMenu.contains(e.target)) {
+      dropdownMenu.classList.add('hidden', 'opacity-0', 'scale-95');
+      dropdownMenu.classList.remove('opacity-100', 'scale-100');
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      dropdownMenu.classList.add('hidden', 'opacity-0', 'scale-95');
+      dropdownMenu.classList.remove('opacity-100', 'scale-100');
+    }
+  });
+
+  // Sidebar toggle functionality remains the same
+  const toggleBtn = document.getElementById('toggleSidebar');
+  const sidebar = document.getElementById('sidebar');
+  const sidebarIcon = document.getElementById('sidebarIcon');
+
+  // Smooth transition
+  sidebar.classList.add("transition-all", "duration-300", "ease-in-out");
+
+  // Toggle sidebar
+  toggleBtn.addEventListener('click', () => {
+    const isCollapsed = sidebar.classList.contains('-ml-64');
+
+    if (isCollapsed) {
+      sidebar.classList.remove('-ml-64');
+      sidebarIcon.innerHTML = `
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M15 19l-7-7 7-7" />`; // ← collapse arrow
+    } else {
+      sidebar.classList.add('-ml-64');
+      sidebarIcon.innerHTML = `
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M4 6h16M4 12h16M4 18h16"/>`; // hamburger
+    }
+  });
+
+  // Default: collapse on small screens
+  if (window.innerWidth < 768) {
+    sidebar.classList.add('-ml-64');
+  }
+</script>
+</script>

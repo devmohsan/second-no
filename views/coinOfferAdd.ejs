@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Second Number - Add Rewards</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    :root {
+      --color-primary: #2e2545;
+      --color-primary-light: #3a3152;
+      --color-accent: #7c6caf;
+      --color-accent-light: #a396cf;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-input {
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      box-shadow: 0 0 0 3px rgba(124, 108, 175, 0.1);
+    }
+
+    .coin-badge {
+      display: inline-flex;
+      align-items: center;
+      background: linear-gradient(135deg, #fcd34d, #f59e0b);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .status-toggle {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+
+    .status-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .status-toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #e5e7eb;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .status-toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .status-toggle-slider {
+      background-color: #10b981;
+    }
+
+    input:checked + .status-toggle-slider:before {
+      transform: translateX(30px);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-sans antialiased">
+  <div class="flex h-screen overflow-hidden">
+    <%- include('partials/sidebar') %>
+
+    <div class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
+      <%- include('partials/header') %>
+      
+      <main class="flex-1 p-6">
+        <div class="max-w-4xl mx-auto animate-fade-in">
+          <!-- Back Button -->
+          <div class="mb-6">
+            <a href="/admin/coin_offers" class="inline-flex items-center text-[var(--color-primary)] hover:text-[var(--color-primary-light)] transition-colors">
+              <i class="fas fa-arrow-left mr-2"></i> Back to Coin Offers
+            </a>
+          </div>
+
+          <!-- Main Card -->
+          <div class="card bg-white rounded-xl p-6 mb-6">
+            <!-- Header Section -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+              <div>
+                <h1 class="text-2xl font-bold text-gray-800">Add New Coin Offer</h1>
+                <p class="text-gray-600 mt-2">Create a new offer for your platform</p>
+              </div>
+
+            </div>
+
+            <!-- Add Form -->
+            <form action="/admin/coin_offers/store" method="POST" class="space-y-6">
+              <!-- Title -->
+              <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                <input 
+                  type="text" 
+                  id="name"
+                  name="name" 
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all duration-200 form-input" 
+                  placeholder="Enter  title"
+                  required
+                >
+              </div>
+
+              <!-- Coins -->
+              <div>
+                <label for="coins_required" class="block text-sm font-medium text-gray-700 mb-2">Required Coins*</label>
+                <input 
+                  type="number"
+                  id="coins_required"
+                  name="coins_required" 
+                  min="1"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all duration-200 form-input" 
+                  placeholder="Enter required coin value"
+                  required
+                >
+              </div>
+                            <div>
+                <label for="reward_value" class="block text-sm font-medium text-gray-700 mb-2">Reward Value *</label>
+                <input 
+                  type="text"
+                  id="reward_value"
+                  name="reward_value" 
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all duration-200 form-input" 
+                  placeholder="Enter reward value in days"
+                  required
+                >
+
+              </div>
+
+              <!-- Status Toggle -->
+              <!-- <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <p class="text-sm text-gray-600">Set whether this reward is active or inactive</p>
+                </div>
+                <label class="status-toggle">
+                  <input 
+                    type="checkbox" 
+                    name="status" 
+                    value="active" 
+                    checked
+                  >
+                  <span class="status-toggle-slider"></span>
+                </label>
+                <input type="hidden" name="status" value="active">
+              </div> -->
+
+              <!-- Form Actions -->
+              <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t">
+                <button 
+                  type="submit" 
+                  class="px-6 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] text-white font-medium rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                >
+                  <i class="fas fa-plus mr-2"></i> Create Coin Offer
+                </button>
+                <a 
+                  href="/admin/coin_offers?" 
+                  class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors text-center"
+                >
+                  <i class="fas fa-times mr-2"></i> Cancel
+                </a>
+              </div>
+            </form>           
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Handle checkbox to hidden field conversion for status
+    document.addEventListener('DOMContentLoaded', function() {
+      const checkbox = document.querySelector('input[type="checkbox"][name="status"]');
+      const hiddenField = document.querySelector('input[type="hidden"][name="status"]');
+      
+      checkbox.addEventListener('change', function() {
+        hiddenField.value = this.checked ? 'active' : 'inactive';
+      });
+
+      // Form validation
+      const form = document.querySelector('form');
+      form.addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const coins = document.getElementById('coins').value.trim();
+        
+
+        
+        if (!title) {
+          e.preventDefault();
+          alert('Please enter a title for the reward.');
+          document.getElementById('title').focus();
+          return;
+        }
+        
+        if (!coins || parseInt(coins) < 1) {
+          e.preventDefault();
+          alert('Please enter a valid coin value (minimum 1).');
+          document.getElementById('coins').focus();
+          return;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

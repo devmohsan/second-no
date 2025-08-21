@@ -5,11 +5,11 @@ const db = require('../database/db');
 
 
 
-router.get('/get-active_packages', async (req, res) => {
+router.get('/get-active_packages',authenticateToken, async (req, res) => {
 
     try {
         const packages = await db.mySqlQury(
-            'SELECT * FROM packages WHERE status = ?',
+            'SELECT * FROM credit_packages WHERE status = ?',
             ['active'] // parameters should be in an array
         );
         if (packages.length === 0) {

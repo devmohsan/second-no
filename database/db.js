@@ -28,4 +28,9 @@ const mySqlQury = (qry, params = []) => {
     });
 };
 
-module.exports = { connection, mySqlQury };
+// module.exports = { connection, mySqlQury };
+module.exports = {
+    connection,              // raw pool
+    promisePool: connection.promise(), // for async/await + transactions
+    mySqlQury          // helper for simple queries
+};

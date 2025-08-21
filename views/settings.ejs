@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Configuration | Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            dark: {
+              800: '#1e293b',
+              900: '#0f172a',
+            }
+          },
+          boxShadow: {
+            'card': '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+            'card-hover': '0 14px 28px rgba(0,0,0,0.12), 0 10px 10px rgba(0,0,0,0.10)'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .form-input {
+      transition: all 0.3s ease;
+    }
+    .form-input:focus {
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    .toggle-password {
+      transition: color 0.2s ease;
+    }
+    .toggle-password:hover {
+      color: #4f46e5;
+    }
+    .section-divider {
+      border-color: rgba(226, 232, 240, 0.5);
+    }
+  </style>
+  <script>
+    const sensitiveFields = [
+      'jwt_secret',
+      'smtp_pass',
+      'twilio_authtoken',
+      'stripe_private_key',
+      'encryption_secret_key'
+    ];
+  </script>
+</head>
+
+<body class="bg-gray-50 font-sans antialiased">
+  <div class="flex h-screen overflow-hidden">
+    <%- include('partials/sidebar') %>
+
+    <div class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
+      <%- include('partials/header') %>
+
+      <main class="flex-1 p-6 bg-gray-50">
+        <div class="max-w-5xl mx-auto">
+          <!-- Page Header -->
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div class="mb-4 md:mb-0">
+              <h1 class="text-2xl font-bold text-gray-800">System Configuration</h1>
+              <p class="text-sm text-gray-600 mt-1">Manage your application settings and integrations</p>
+            </div>
+            <button id="saveSettings" class="px-5 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-sm flex items-center justify-center">
+              <i class="fas fa-save mr-2"></i> Save Changes
+            </button>
+          </div>
+
+          <!-- Settings Form -->
+          <div class="bg-white rounded-xl shadow-card overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-800">Application Settings</h2>
+              <p class="text-sm text-gray-500 mt-1">Configure core application parameters</p>
+            </div>
+            
+            <form id="settingsForm" class="divide-y section-divider">
+              <% if (setting) { %>
+                <!-- JWT Settings -->
+                <div class="p-6">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                      <label for="jwt_secret" class="block text-sm font-medium text-gray-700 mb-1">JWT Secret Key</label>
+                      <p class="text-xs text-gray-500 mb-2">Used for securing authentication tokens</p>
+                      <div class="relative mt-1">
+                        <input 
+                          type="password" 
+                          id="jwt_secret" 
+                          name="jwt_secret" 
+                          value="<%= setting.jwt_secret %>"
+                          class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm pr-10"
+                          placeholder="Enter JWT secret key"
+                          required
+                        >
+                        <button type="button" 
+                          class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-600"
+                          onclick="togglePasswordVisibility('jwt_secret')"
+                        >
+                          <i class="far fa-eye"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="flex items-end">
+                      <p class="text-xs text-gray-500">
+                        <i class="fas fa-clock mr-1"></i> Last updated: <%= new Date(setting.updated_at).toLocaleString() %>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Email Settings -->
+                <div class="p-6">
+                  <h3 class="text-md font-medium text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-envelope mr-2 text-primary-600"></i> Email Configuration
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label for="smtp_user" class="block text-sm font-medium text-gray-700 mb-1">SMTP Username</label>
+                      <input 
+                        type="text" 
+                        id="smtp_user" 
+                        name="smtp_user" 
+                        value="<%= setting.smtp_user %>"
+                        class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm"
+                        placeholder="SMTP username"
+                      >
+                    </div>
+                    <div>
+                      <label for="smtp_pass" class="block text-sm font-medium text-gray-700 mb-1">SMTP Password</label>
+                      <div class="relative mt-1">
+                        <input 
+                          type="password" 
+                          id="smtp_pass" 
+                          name="smtp_pass" 
+                          value="<%= setting.smtp_pass %>"
+                          class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm pr-10"
+                          placeholder="SMTP password"
+                        >
+                        <button type="button" 
+                          class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-600"
+                          onclick="togglePasswordVisibility('smtp_pass')"
+                        >
+                          <i class="far fa-eye"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Twilio Settings -->
+                <div class="p-6">
+                  <h3 class="text-md font-medium text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-sms mr-2 text-primary-600"></i> Twilio Configuration
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label for="twilio_sid" class="block text-sm font-medium text-gray-700 mb-1">Account SID</label>
+                      <input 
+                        type="text" 
+                        id="twilio_sid" 
+                        name="twilio_sid" 
+                        value="<%= setting.twilio_sid %>"
+                        class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm"
+                        placeholder="Twilio SID"
+                      >
+                    </div>
+                    <div>
+                      <label for="twilio_authtoken" class="block text-sm font-medium text-gray-700 mb-1">Auth Token</label>
+                      <div class="relative mt-1">
+                        <input 
+                          type="password" 
+                          id="twilio_authtoken" 
+                          name="twilio_authtoken" 
+                          value="<%= setting.twilio_authtoken %>"
+                          class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm pr-10"
+                          placeholder="Twilio auth token"
+                        >
+                        <button type="button" 
+                          class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-600"
+                          onclick="togglePasswordVisibility('twilio_authtoken')"
+                        >
+                          <i class="far fa-eye"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stripe Settings -->
+                <div class="p-6">
+                  <h3 class="text-md font-medium text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-credit-card mr-2 text-primary-600"></i> Stripe Configuration
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label for="stripe_publishable_key" class="block text-sm font-medium text-gray-700 mb-1">Publishable Key</label>
+                      <input 
+                        type="text" 
+                        id="stripe_publishable_key" 
+                        name="stripe_publishable_key" 
+                        value="<%= setting.stripe_publishable_key %>"
+                        class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm"
+                        placeholder="pk_test_..."
+                      >
+                    </div>
+                    <div>
+                      <label for="stripe_private_key" class="block text-sm font-medium text-gray-700 mb-1">Secret Key</label>
+                      <div class="relative mt-1">
+                        <input 
+                          type="password" 
+                          id="stripe_private_key" 
+                          name="stripe_private_key" 
+                          value="<%= setting.stripe_private_key %>"
+                          class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm pr-10"
+                          placeholder="sk_test_..."
+                        >
+                        <button type="button" 
+                          class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-600"
+                          onclick="togglePasswordVisibility('stripe_private_key')"
+                        >
+                          <i class="far fa-eye"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="p-6">
+                  <h3 class="text-md font-medium text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-shield-alt mr-2 text-primary-600"></i> Security Configuration
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label for="encryption_secret_key" class="block text-sm font-medium text-gray-700 mb-1">Encryption Key</label>
+                      <p class="text-xs text-gray-500 mb-2">Used for data encryption/decryption</p>
+                      <div class="relative mt-1">
+                        <input 
+                          type="password" 
+                          id="encryption_secret_key" 
+                          name="encryption_secret_key" 
+                          value="<%= setting.encryption_secret_key %>"
+                          class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm pr-10"
+                          placeholder="Encryption secret key"
+                          required
+                        >
+                        <button type="button" 
+                          class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-600"
+                          onclick="togglePasswordVisibility('encryption_secret_key')"
+                        >
+                          <i class="far fa-eye"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label for="coins_per_day_limit" class="block text-sm font-medium text-gray-700 mb-1">Daily Coins Limit</label>
+                      <p class="text-xs text-gray-500 mb-2">Maximum coins users can earn per day</p>
+                      <input 
+                        type="number" 
+                        id="coins_per_day_limit" 
+                        name="coins_per_day_limit" 
+                        value="<%= setting.coins_per_day_limit %>"
+                        min="0"
+                        class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm"
+                        placeholder="Enter daily limit"
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Application Status -->
+                <div class="p-6 bg-gray-50">
+                  <h3 class="text-md font-medium text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-power-off mr-2 text-primary-600"></i> Application Status
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                      <label for="status" class="block text-sm font-medium text-gray-700 mb-1">System Status</label>
+                      <p class="text-xs text-gray-500 mb-2">Control the availability of your application</p>
+                      <select
+                        id="status"
+                        name="status"
+                        class="form-input block w-full rounded-lg border-gray-300 py-2 pl-3 pr-10 text-base focus:border-primary-600 focus:outline-none focus:ring-primary-600 sm:text-sm"
+                      >
+                        <option value="active" <%= setting.status === 'active' ? 'selected' : '' %>>Active - System fully operational</option>
+                        <option value="inactive" <%= setting.status === 'inactive' ? 'selected' : '' %>>Inactive - System unavailable</option>
+                        <option value="maintenance" <%= setting.status === 'maintenance' ? 'selected' : '' %>>Maintenance - Limited functionality</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              <% } else { %>
+                <div class="p-8 text-center">
+                  <i class="fas fa-cog text-4xl text-gray-300 mb-3"></i>
+                  <p class="text-gray-500">No configuration settings found</p>
+                  <p class="text-sm text-gray-400 mt-1">Please check your database connection</p>
+                </div>
+              <% } %>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function togglePasswordVisibility(fieldId) {
+      const field = document.getElementById(fieldId);
+      const icon = field.nextElementSibling.querySelector('i');
+      if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        field.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    document.getElementById('saveSettings').addEventListener('click', async function(e) {
+      e.preventDefault();
+      
+      const form = document.getElementById('settingsForm');
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+    //   // Validate required fields
+    //   if (!data.jwt_secret || !data.encryption_secret_key) {
+    //     Swal.fire({
+    //       icon: 'error',
+    //       title: 'Validation Error',
+    //       text: 'JWT Secret and Encryption Key are required fields',
+    //       confirmButtonColor: '#4f46e5',
+    //       background: '#ffffff'
+    //     });
+    //     return;
+    //   }
+
+      // Show loading state
+      const saveBtn = document.getElementById('saveSettings');
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
+      saveBtn.disabled = true;
+
+      try {
+        const response = await fetch('/admin/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Settings Saved',
+            text: result.message,
+            timer: 2000,
+            showConfirmButton: false,
+            background: '#ffffff',
+          });
+          
+          // Refresh the page after 2 seconds to show updated values
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          throw new Error(result.message || 'Failed to save settings');
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Save Failed',
+          text: error.message,
+          confirmButtonColor: '#4f46e5',
+          background: '#ffffff'
+        });
+      } finally {
+        // Reset button state
+        saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Save Changes';
+        saveBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

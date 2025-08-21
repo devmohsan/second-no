@@ -171,6 +171,7 @@ router.post('/login', async (req, res) => {
         });
 
         const userData = {
+            id: user.id,
             email: user.email,
             name: user.name,
             status: user.is_active
@@ -251,7 +252,7 @@ router.post('/resend-otp', async (req, res) => {
 })
 
 
-router.post('/get-forgot-otp', async (res, req) => {
+router.post('/get-forgot-otp', async (req, res) => {
     const { email } = req.body;
 
     try {
@@ -264,6 +265,13 @@ router.post('/get-forgot-otp', async (res, req) => {
         }
 
         const [user] = await db.mySqlQury('SELECT * FROM users WHERE email = ?', [email])
+
+        if(user.loginType !== null){
+            return res.json({
+                status:false,
+                message: 'Invalid Email for forgot Password, try google or facebook login'
+            })
+        }
 
         if (!user) {
             return res.json({
@@ -462,7 +470,7 @@ router.post('/login-or-register', async (req, res) => {
         return res.status(200).json({
             status: true,
             message: 'Login  successfully',
-            user: {
+            userData: {
                 id: user.id,
                 email: user.email,
                 name: user.name,

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Second Number - Number View</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    :root {
+      --color-primary: #2e2545;
+      --color-primary-light: #3a3152;
+      --color-accent: #7c6caf;
+      --color-accent-light: #a396cf;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+    }
+
+    .status-badge {
+      transition: all 0.2s ease;
+      padding: 0.25rem 0.75rem;
+    }
+
+    .status-badge:hover {
+      transform: scale(1.05);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .info-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      border-left: 4px solid var(--color-accent);
+    }
+
+    .user-card {
+      background: white;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+      transition: all 0.2s ease;
+    }
+
+    .user-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+      position: relative;
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 60px;
+      height: 2px;
+      background: var(--color-accent);
+    }
+
+    .flag-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 0.75rem;
+      background: linear-gradient(135deg, #7c6caf 0%, #a396cf 100%);
+      color: white;
+      font-weight: bold;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .number-display {
+      font-family: 'Courier New', monospace;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      letter-spacing: 0.05em;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: #f8fafc;
+      border-radius: 0.75rem;
+      border: 2px dashed #cbd5e1;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e2e8f0;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: 0.5rem;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      border: 2px solid white;
+      box-shadow: 0 0 0 2px var(--color-accent);
+    }
+
+    .transaction-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .transaction-success {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .transaction-pending {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .transaction-failed {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .amount-display {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-sans antialiased">
+  <div class="flex h-screen overflow-hidden">
+    <%- include('partials/sidebar') %>
+
+    <div class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
+      <%- include('partials/header') %>
+      
+      <main class="flex-1 p-6">
+        <div class="max-w-6xl mx-auto animate-fade-in">
+          <!-- Back Button -->
+          <div class="mb-6">
+            <a href="/admin/numbers" class="inline-flex items-center text-[var(--color-primary)] hover:text-[var(--color-primary-light)] transition-colors">
+              <i class="fas fa-arrow-left mr-2"></i> Back to Numbers
+            </a>
+          </div>
+
+          <!-- Main Card -->
+          <div class="card bg-white rounded-xl p-6 mb-6">
+            <!-- Header Section -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+              <div>
+                <h1 class="text-2xl font-bold text-gray-800">Number Details</h1>
+                <p class="text-gray-600 mt-2">Complete information about this phone number</p>
+              </div>
+              
+              <div class="mt-4 md:mt-0">
+                <span class="status-badge inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                  <% if (purchasedNo.status === 'active') { %>bg-green-100 text-green-800<% } %>
+                  <% if (purchasedNo.status === 'released') { %>bg-blue-100 text-blue-800<% } %>
+                  <% if (purchasedNo.status === 'inactive') { %>bg-gray-100 text-gray-800<% } %>
+                  <% if (purchasedNo.status === 'expired') { %>bg-yellow-100 text-yellow-800<% } %>">
+                  <i class="fas fa-circle mr-2" style="font-size: 6px;"></i> 
+                  <%= purchasedNo.status.charAt(0).toUpperCase() + purchasedNo.status.slice(1) %>
+                </span>
+              </div>
+            </div>
+
+            <!-- Number Information Grid -->
+            <div class="info-grid mb-8">
+              <div class="info-card">
+                <div class="flex items-center mb-4">
+                  <div class="flag-container mr-4">
+                    <img src="https://flagcdn.com/24x18/<%= purchasedNo.c_name.toLowerCase() %>.png" alt="<%= purchasedNo.c_name %> flag" class="w-6 h-4 rounded-sm shadow" />
+                    
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Country & Region</h3>
+                    <p class="text-gray-600"><%= purchasedNo.c_name %> - <%= purchasedNo.r_name %></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2">Phone Number</h3>
+                  <p class="number-display"><%= purchasedNo.number %></p>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2">Twilio SID</h3>
+                  <p class="text-gray-600 font-mono text-sm break-all"><%= purchasedNo.sid %></p>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2">Timeline</h3>
+                  <div class="timeline">
+                    <div class="timeline-item">
+                      <p class="text-sm font-medium text-gray-800">Created</p>
+                      <p class="text-xs text-gray-500"><%= new Date(purchasedNo.created_at).toLocaleString() %></p>
+                    </div>
+                    <div class="timeline-item">
+                      <p class="text-sm font-medium text-gray-800">Last Updated</p>
+                      <p class="text-xs text-gray-500"><%= new Date(purchasedNo.updated_at).toLocaleString() %></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Purchased By Section -->
+            <div class="mb-8">
+              <h2 class="text-xl font-bold text-gray-800 section-title">Purchased By</h2>
+              
+              <% if (purchasedBy.length > 0) { %>
+                <div class="grid grid-cols-1 gap-4">
+                  <% purchasedBy.forEach(user => { %>
+                    <div class="user-card">
+                      <div class="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 class="font-semibold text-gray-800"><%= user.user_name %></h3>
+                          <p class="text-sm text-gray-600"><%= user.user_email %></p>
+                        </div>
+                        <span class="status-badge inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
+                          <% if (user.status === 'active') { %>bg-green-100 text-green-800<% } %>
+                          <% if (user.status === 'expired') { %>bg-yellow-100 text-yellow-800<% } %>
+                          <% if (user.status === 'inactive') { %>bg-gray-100 text-gray-800<% } %>">
+                          <%= user.status %>
+                        </span>
+                      </div>
+                      
+                      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm mb-4">
+                        <div>
+                          <p class="text-gray-500">Start Date</p>
+                          <p class="font-medium"><%= new Date(user.start_date).toLocaleDateString() %></p>
+                        </div>
+                        <div>
+                          <p class="text-gray-500">End Date</p>
+                          <p class="font-medium"><%= new Date(user.end_date).toLocaleDateString() %></p>
+                        </div>
+                        <div>
+                          <p class="text-gray-500">Source</p>
+                          <p class="font-medium capitalize"><%= user.source_type %></p>
+                        </div>
+                        <div>
+                          <p class="text-gray-500">Package ID</p>
+                          <p class="font-medium"><%= user.package_id || 'N/A' %></p>
+                        </div>
+                      </div>
+
+                      <!-- Transaction Details -->
+                      <% if (user.transaction_id) { %>
+                        <div class="border-t pt-4 mt-4">
+                          <h4 class="font-semibold text-gray-800 mb-3">Transaction Details</h4>
+                          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                            <div>
+                              <p class="text-gray-500">Transaction ID</p>
+                              <p class="font-medium"><%= user.transaction_id %></p>
+                            </div>
+                            <div>
+                              <p class="text-gray-500">Amount</p>
+                              <p class="font-medium amount-display">$<%= user.transaction_amount %></p>
+                            </div>
+                            <div>
+                              <p class="text-gray-500">Transaction Date</p>
+                              <p class="font-medium"><%= new Date(user.transaction_date).toLocaleDateString() %></p>
+                            </div>
+                            <div>
+                              <p class="text-gray-500">Status</p>
+                              <span class="transaction-badge 
+                                <% if (user.transaction_status === 'succeeded') { %>transaction-success<% } %>
+                                <% if (user.transaction_status === 'pending') { %>transaction-pending<% } %>
+                                <% if (user.transaction_status === 'failed') { %>transaction-failed<% } %>">
+                                <i class="fas 
+                                  <% if (user.transaction_status === 'succeeded') { %>fa-check-circle<% } %>
+                                  <% if (user.transaction_status === 'pending') { %>fa-clock<% } %>
+                                  <% if (user.transaction_status === 'failed') { %>fa-times-circle<% } %> 
+                                  mr-1"></i>
+                                <%= user.transaction_status %>
+                              </span>
+                            </div>
+                            <% if (user.trxid) { %>
+                              <div class="md:col-span-2">
+                                <p class="text-gray-500">Transaction Reference</p>
+                                <p class="font-medium font-mono text-sm break-all"><%= user.trxid %></p>
+                              </div>
+                            <% } %>
+                          </div>
+                        </div>
+                      <% } %>
+                    </div>
+                  <% }) %>
+                </div>
+              <% } else { %>
+                <div class="empty-state">
+                  <i class="fas fa-shopping-cart text-gray-300 text-4xl mb-3"></i>
+                  <h3 class="text-lg font-medium text-gray-600">No purchase records</h3>
+                  <p class="text-gray-500">This number hasn't been purchased by any users</p>
+                </div>
+              <% } %>
+            </div>
+
+            <!-- Rewarded To Section -->
+            <div class="mb-8">
+              <h2 class="text-xl font-bold text-gray-800 section-title">Rewarded To</h2>
+              
+              <% if (rewardedTo.length > 0) { %>
+                <div class="grid grid-cols-1 gap-4">
+                  <% rewardedTo.forEach(user => { %>
+                    <div class="user-card">
+                      <div class="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 class="font-semibold text-gray-800"><%= user.user_name %></h3>
+                          <p class="text-sm text-gray-600"><%= user.user_email %></p>
+                        </div>
+                        <span class="status-badge inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
+                          <% if (user.status === 'active') { %>bg-green-100 text-green-800<% } %>
+                          <% if (user.status === 'expired') { %>bg-yellow-100 text-yellow-800<% } %>
+                          <% if (user.status === 'inactive') { %>bg-gray-100 text-gray-800<% } %>">
+                          <%= user.status %>
+                        </span>
+                      </div>
+                      
+                      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <p class="text-gray-500">Start Date</p>
+                          <p class="font-medium"><%= new Date(user.start_date).toLocaleDateString() %></p>
+                        </div>
+                        <div>
+                          <p class="text-gray-500">End Date</p>
+                          <p class="font-medium"><%= new Date(user.end_date).toLocaleDateString() %></p>
+                        </div>
+                        <div>
+                          <p class="text-gray-500">Source</p>
+                          <p class="font-medium capitalize"><%= user.source_type.replace('_', ' ') %></p>
+                        </div>
+                        <div>
+                          <p class="text-gray-500">Offer ID</p>
+                          <p class="font-medium"><%= user.coin_offer_id || 'N/A' %></p>
+                        </div>
+                      </div>
+                    </div>
+                  <% }) %>
+                </div>
+              <% } else { %>
+                <div class="empty-state">
+                  <i class="fas fa-gift text-gray-300 text-4xl mb-3"></i>
+                  <h3 class="text-lg font-medium text-gray-600">No reward records</h3>
+                  <p class="text-gray-500">This number hasn't been rewarded to any users</p>
+                </div>
+              <% } %>
+            </div>
+
+            <!-- Actions Section -->
+            <div class="border-t pt-6">
+              <h2 class="text-xl font-bold text-gray-800 section-title">Actions</h2>
+              <div class="flex flex-wrap gap-3">
+                <a href="/admin/numbers" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+                  <i class="fas fa-arrow-left mr-2"></i> Back to List
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Add any interactive functionality here if needed
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Number view page loaded');
+    });
+  </script>
+</body>
+</html>
